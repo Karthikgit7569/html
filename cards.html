@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Custom Playing Cards</title>
+  <style>
+    /* Container for all cards */
+    #playing-cards {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 30px;
+      background-color:pink;
+    }
+
+    /* Individual card styling */
+    .card {
+      display: flex;
+      justify-content: space-between;
+      flex-direction: column;
+      width: 150px;
+      height: 220px;
+      border: 2px solid #444;
+      border-radius: 10px;
+      background-color: #fff;
+      padding: 10px;
+      box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .left {
+      align-self: flex-start;
+      font-size: 1.5rem;
+      color: red;
+    }
+
+    .middle {
+      align-self: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      font-size: 2rem;
+      flex-grow: 1;
+    }
+
+    .right {
+      align-self: flex-end;
+      font-size: 1.5rem;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+  <main id="playing-cards">
+    <div class="card">
+      <div class="left">♥</div>
+      <div class="middle">
+        <div>Q</div>
+        <div>♥</div>
+      </div>
+      <div class="right">♥</div>
+    </div>
+
+    <div class="card">
+      <div class="left">♣</div>
+      <div class="middle">
+        <div>10</div>
+        <div>♣</div>
+      </div>
+      <div class="right">♣</div>
+    </div>
+
+    <div class="card">
+      <div class="left">♠</div>
+      <div class="middle">
+        <div>A</div>
+        <div>♠</div>
+      </div>
+      <div class="right">♠</div>
+    </div>
+  </main>
+
+</body>
+</html>
