@@ -1,0 +1,73 @@
+
+  body {
+      font-family: Arial, sans-serif;
+      background-color: lightcyan;
+      padding: 10px;
+    }
+
+    .container {
+      max-width: 100px;
+      background:red;
+      padding: 10px;
+      margin: auto;
+      border-radius: 7px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      -webkit-border-radius: 7px;
+      -moz-border-radius: 7px;
+      -ms-border-radius: 7px;
+      -o-border-radius: 7px;
+}
+
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    select {
+      width: 50%;
+      padding: 8px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      -webkit-border-radius: 4px;
+      -moz-border-radius: 4px;
+      -ms-border-radius: 4px;
+      -o-border-radius: 4px;
+}
+
+    .form-group.gender {
+      display: flex;
+      align-items: center;
+    }
+
+    .form-group.gender label {
+      margin-right: 10px;
+    }
+
+    button {
+      width: 50%;
+      padding: 10px;
+      background-color: green;
+      color: red;
+      border: none;
+      border-radius: 4px;
+      font-size: 20px;
+      cursor: pointer;
+      -webkit-border-radius: 4px;
+      -moz-border-radius: 4px;
+      -ms-border-radius: 4px;
+      -o-border-radius: 4px;
+}
+
+    button:hover {
+      background-color: black;
+    }

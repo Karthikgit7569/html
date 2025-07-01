@@ -1,0 +1,17 @@
+
+/* Add this to your existing CSS */
+.nav-link.active {
+    color: var(--secondary-color) !important;
+    font-weight: 600;
+}
+
+/* Ensure sections have proper spacing */
+section {
+    padding: 80px 0;
+    scroll-margin-top: 70px; /* matches navbar height */
+}
+
+/* Adjust hero section padding */
+.hero {
+    padding: 120px 0 100px;
+}
