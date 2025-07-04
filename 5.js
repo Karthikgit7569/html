@@ -1,229 +1,238 @@
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // Main initialization function
-    function initializeWebsite() {
-        // Configuration
-        const config = {
-            navbarSelector: '.navbar',
-            navLinkSelector: '.nav-link[href^="#"]',
-            sectionSelector: 'section[id]',
-            contactFormId: 'contactForm',
-            successMessageId: 'formSuccess',
-            scrollOffset: 70,
-            scrollBehavior: 'smooth'
-        };
 
-        // DOM Elements
-        const elements = {
-            navbar: null,
-            navLinks: [],
-            sections: [],
-            contactForm: null,
-            successMessage: null
-        };
+// cart.js - Cart functionality for Karthik Tech Solutions
 
-        // Initialize all components
-        function init() {
-            loadElements();
-            if (validateElements()) {
-                setupEventListeners();
-                handleInitialState();
-                console.log('Website initialized successfully');
-            }
-        }
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize cart if it doesn't exist in localStorage
+    if (!localStorage.getItem('cart')) {
+        localStorage.setItem('cart', JSON.stringify([]));
+    }
 
-        // Load DOM elements
-        function loadElements() {
-            elements.navbar = document.querySelector(config.navbarSelector);
-            elements.navLinks = Array.from(document.querySelectorAll(config.navLinkSelector));
-            elements.sections = Array.from(document.querySelectorAll(config.sectionSelector));
-            elements.contactForm = document.getElementById(config.contactFormId);
-            elements.successMessage = document.getElementById(config.successMessageId);
-        }
+    // Cart state
+    let cart = JSON.parse(localStorage.getItem('cart'));
 
-        // Validate essential elements
-        function validateElements() {
-            if (!elements.navbar) {
-                console.warn('Navbar not found');
-                return false;
-            }
-            if (elements.navLinks.length === 0) {
-                console.warn('Navigation links not found');
-                return false;
-            }
-            return true;
-        }
+    // DOM elements
+    const cartIcon = document.createElement('div');
+    cartIcon.id = 'cart-icon';
+    cartIcon.innerHTML = `
+        <a href="#cart-modal" data-bs-toggle="modal" class="position-relative">
+            <i class="fas fa-shopping-cart fa-lg text-white"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cart-count">
+                ${cart.length}
+            </span>
+        </a>
+    `;
 
-        // Setup all event listeners
-        function setupEventListeners() {
-            // Navigation clicks
-            elements.navLinks.forEach(link => {
-                link.addEventListener('click', handleNavClick);
+    // Add cart icon to navbar
+    const navbar = document.querySelector('.navbar .container');
+    const cartIconContainer = document.createElement('div');
+    cartIconContainer.className = 'ms-3';
+    cartIconContainer.appendChild(cartIcon);
+    navbar.appendChild(cartIconContainer);
+
+    // Create cart modal
+    const cartModal = document.createElement('div');
+    cartModal.className = 'modal fade';
+    cartModal.id = 'cart-modal';
+    cartModal.tabIndex = '-1';
+    cartModal.innerHTML = `
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Your Cart</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="cart-items-container">
+                        ${cart.length === 0 ? 
+                            '<p class="text-center">Your cart is empty</p>' : 
+                            generateCartItemsHTML(cart)}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Continue Browsing</button>
+                    <button type="button" class="btn btn-primary" id="checkout-btn">Proceed to Checkout</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(cartModal);
+
+    // Add "Add to Cart" buttons to service cards
+    const serviceCards = document.querySelectorAll('.service-card');
+    serviceCards.forEach(card => {
+        const serviceTitle = card.querySelector('h3').textContent;
+        const serviceDescription = card.querySelector('p').textContent;
+        
+        const addToCartBtn = document.createElement('button');
+        addToCartBtn.className = 'btn btn-primary btn-sm mt-3';
+        addToCartBtn.textContent = 'Add to Cart';
+        addToCartBtn.addEventListener('click', () => {
+            addToCart({
+                title: serviceTitle,
+                description: serviceDescription,
+                price: 99.99 // Default price, you can customize this
             });
+        });
+        
+        card.querySelector('.card-body').appendChild(addToCartBtn);
+    });
 
-            // Scroll events
-            window.addEventListener('scroll', throttle(handleScroll, 100));
-            
-            // Form submission
-            if (elements.contactForm) {
-                elements.contactForm.addEventListener('submit', handleFormSubmit);
-            }
-        }
-
-        // Handle navigation clicks
-        function handleNavClick(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            
-            if (!targetId || targetId === '#') return;
-            
-            const targetElement = document.querySelector(targetId);
-            if (!targetElement) return;
-            
-            scrollToElement(targetElement);
-            updateUrl(targetId);
-            closeMobileMenu();
-        }
-
-        // Smooth scroll to element
-        function scrollToElement(element) {
-            const navbarHeight = elements.navbar.offsetHeight;
-            const targetPosition = element.getBoundingClientRect().top + 
-                                 window.pageYOffset - 
-                                 navbarHeight;
-            
-            window.scrollTo({
-                top: Math.max(0, targetPosition),
-                behavior: config.scrollBehavior
-            });
-        }
-
-        // Update URL without page reload
-        function updateUrl(hash) {
-            try {
-                history.replaceState(null, null, hash);
-            } catch (e) {
-                window.location.hash = hash;
-            }
-        }
-
-        // Close mobile menu
-        function closeMobileMenu() {
-            const openMenu = document.querySelector('.navbar-collapse.show');
-            if (openMenu) {
-                try {
-                    const collapse = bootstrap.Collapse.getInstance(openMenu) || 
-                                   new bootstrap.Collapse(openMenu);
-                    collapse.hide();
-                } catch (e) {
-                    openMenu.classList.remove('show');
-                }
-            }
-        }
-
-        // Handle scroll events
-        function handleScroll() {
-            updateActiveSection();
-            updateNavbarStyle();
-        }
-
-        // Update active section in navigation
-        function updateActiveSection() {
-            const scrollPosition = window.pageYOffset;
-            const navbarHeight = elements.navbar.offsetHeight;
-            
-            let currentSection = null;
-            
-            elements.sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                if (scrollPosition >= (sectionTop - navbarHeight - 50)) {
-                    currentSection = section.id;
-                }
-            });
-            
-            elements.navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href') === `#${currentSection}`) {
-                    link.classList.add('active');
-                }
-            });
-        }
-
-        // Update navbar style on scroll
-        function updateNavbarStyle() {
-            if (window.scrollY > 50) {
-                elements.navbar.style.backgroundColor = 'rgba(44, 62, 80, 0.9)';
-                elements.navbar.style.padding = '10px 0';
-            } else {
-                elements.navbar.style.backgroundColor = 'var(--primary-color)';
-                elements.navbar.style.padding = '15px 0';
-            }
-        }
-
-        // Handle form submission
-        function handleFormSubmit(e) {
-            if (!elements.contactForm.checkValidity()) {
-                e.preventDefault();
-                e.stopPropagation();
-            } else {
-                e.preventDefault();
-                if (elements.successMessage) {
-                    elements.successMessage.classList.remove('d-none');
-                    elements.successMessage.scrollIntoView({ behavior: 'smooth' });
-                }
-                elements.contactForm.reset();
-                elements.contactForm.classList.remove('was-validated');
-            }
-            elements.contactForm.classList.add('was-validated');
-        }
-
-        // Handle initial page state
-        function handleInitialState() {
-            // Initial navbar style
-            updateNavbarStyle();
-            
-            // Initial active section
-            updateActiveSection();
-            
-            // Handle hash URL
-            if (window.location.hash) {
-                const target = document.querySelector(window.location.hash);
-                if (target) {
-                    setTimeout(() => scrollToElement(target), 100);
-                }
-            }
-        }
-
-        // Throttle function for scroll events
-        function throttle(func, limit) {
-            let lastFunc;
-            let lastRan;
-            return function() {
-                const context = this;
-                const args = arguments;
-                if (!lastRan) {
-                    func.apply(context, args);
-                    lastRan = Date.now();
-                } else {
-                    clearTimeout(lastFunc);
-                    lastFunc = setTimeout(function() {
-                        if ((Date.now() - lastRan) >= limit) {
-                            func.apply(context, args);
-                            lastRan = Date.now();
-                        }
-                    }, limit - (Date.now() - lastRan));
-                }
-            };
-        }
-
-        // Start initialization when DOM is ready
-        if (document.readyState !== 'loading') {
-            init();
+    // Add to cart function
+    function addToCart(item) {
+        // Check if item already exists in cart
+        const existingItem = cart.find(cartItem => cartItem.title === item.title);
+        
+        if (existingItem) {
+            existingItem.quantity = (existingItem.quantity || 1) + 1;
         } else {
-            document.addEventListener('DOMContentLoaded', init);
+            item.quantity = 1;
+            cart.push(item);
+        }
+        
+        updateCart();
+        
+        // Show toast notification
+        showToast(`${item.title} added to cart`);
+    }
+
+    // Update cart in UI and localStorage
+    function updateCart() {
+        localStorage.setItem('cart', JSON.stringify(cart));
+        document.getElementById('cart-count').textContent = cart.length;
+        
+        const cartItemsContainer = document.getElementById('cart-items-container');
+        if (cartItemsContainer) {
+            cartItemsContainer.innerHTML = cart.length === 0 ? 
+                '<p class="text-center">Your cart is empty</p>' : 
+                generateCartItemsHTML(cart);
         }
     }
 
-    // Start the application
-    initializeWebsite();
-</script>
+    // Generate HTML for cart items
+    function generateCartItemsHTML(cartItems) {
+        let total = 0;
+        let html = `
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Service</th>
+                            <th>Description</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        cartItems.forEach((item, index) => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+            
+            html += `
+                <tr>
+                    <td>${item.title}</td>
+                    <td>${item.description}</td>
+                    <td>$${item.price.toFixed(2)}</td>
+                    <td>
+                        <div class="input-group input-group-sm" style="width: 100px;">
+                            <button class="btn btn-outline-secondary decrease-quantity" data-index="${index}" type="button">-</button>
+                            <input type="text" class="form-control text-center quantity-input" value="${item.quantity}" readonly>
+                            <button class="btn btn-outline-secondary increase-quantity" data-index="${index}" type="button">+</button>
+                        </div>
+                    </td>
+                    <td>$${itemTotal.toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm remove-item" data-index="${index}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                            <td><strong>$${total.toFixed(2)}</strong></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        `;
+        
+        return html;
+    }
+
+    // Event delegation for cart item actions
+    document.addEventListener('click', function(e) {
+        // Increase quantity
+        if (e.target.classList.contains('increase-quantity')) {
+            const index = e.target.getAttribute('data-index');
+            cart[index].quantity += 1;
+            updateCart();
+        }
+        
+        // Decrease quantity
+        if (e.target.classList.contains('decrease-quantity')) {
+            const index = e.target.getAttribute('data-index');
+            if (cart[index].quantity > 1) {
+                cart[index].quantity -= 1;
+                updateCart();
+            }
+        }
+        
+        // Remove item
+        if (e.target.classList.contains('remove-item') || 
+            e.target.closest('.remove-item')) {
+            const btn = e.target.classList.contains('remove-item') ? 
+                e.target : e.target.closest('.remove-item');
+            const index = btn.getAttribute('data-index');
+            cart.splice(index, 1);
+            updateCart();
+        }
+        
+        // Checkout
+        if (e.target.id === 'checkout-btn') {
+            if (cart.length === 0) {
+                alert('Your cart is empty. Please add services before checkout.');
+                return;
+            }
+            
+            // In a real application, you would redirect to a checkout page
+            alert('Proceeding to checkout. In a real application, this would redirect to a payment page.');
+            console.log('Checkout items:', cart);
+        }
+    });
+
+    // Show toast notification
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast align-items-center text-white bg-success border-0 position-fixed bottom-0 end-0 m-3';
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+        
+        document.body.appendChild(toast);
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        
+        // Remove toast after it's hidden
+        toast.addEventListener('hidden.bs.toast', function() {
+            toast.remove();
+        });
+    }
+});
