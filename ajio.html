@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FashionHub</title>
+  <style>
+    header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 10px;
+      background-color: rgb(30, 58, 73);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+    }
+    .cart-modal, .wishlist-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 350px;
+      height: 100%;
+      background-color: white;
+      box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+      z-index: 1000;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .wishlist-modal {
+      right: 350px;
+    }
+    .cart-item, .wishlist-item {
+      display: flex;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 15px;
+      position: relative;
+    }
+    .cart-item img, .wishlist-item img {
+      width: 80px;
+      height: 100px;
+      object-fit: cover;
+      margin-right: 15px;
+    }
+    .close-cart, .close-wishlist {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+    .product-title {
+      font-family: 'Montserrat', sans-serif;
+      color: #333;
+      margin: 20px 0 10px 20px;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    .product-card {
+      display: inline-block;
+      width: 280px;
+      margin: 15px;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+      position: relative;
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+    .product-info {
+      padding: 15px;
+    }
+    .product-name {
+      font-family: 'Roboto', sans-serif;
+      font-size: 16px;
+      color: #444;
+      margin-bottom: 8px;
+    }
+    .product-price {
+      font-weight: bold;
+      font-size: 18px;
+      color: #1E293B;
+      margin: 5px 0;
+    }
+    .product-popularity {
+      color: #4CAF50;
+      font-size: 14px;
+      margin: 5px 0;
+    }
+    .add-to-cart {
+      padding: 8px 15px;
+      background-color: #1a237e;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      width: 100%;
+      transition: background 0.3s;
+      margin-top: 5px;
+    }
+    .add-to-cart:hover {
+      background-color: #0d1442;
+    }
+    .wishlist-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+    .wishlist-btn.active {
+      color: red;
+    }
+    .move-to-cart {
+      padding: 5px 10px;
+      background-color: #1a237e;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+    .remove-item {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: #999;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    /* Kids Section Styles */
+    #kids {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: rgb(240, 244, 246);
+    }
+    #kids td {
+      text-align: center;
+      padding: 15px;
+      vertical-align: top;
+    }
+    #kids .product-card {
+      background-color: #fff;
+      border: 1px solid #e0e0e0;
+    }
+    #kids .product-name {
+      color: #333;
+      font-weight: 600;
+    }
+    #kids .product-price {
+      color: #1a237e;
+    }
+    #kids .product-popularity {
+      color: #4CAF50;
+    }
+    #kids img {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+      background-color: #f5f5f5;
+    }
+    
+    /* Checkout Modal */
+    .checkout-modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 400px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      z-index: 1001;
+    }
+    .checkout-modal h2 {
+      margin-top: 0;
+    }
+    .checkout-modal input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .checkout-modal button {
+      padding: 10px 15px;
+      background-color: #1a237e;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 1200px) {
+      .product-card {
+        width: 250px;
+      }
+    }
+    @media (max-width: 992px) {
+      .product-card {
+        width: 220px;
+      }
+    }
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        padding: 15px;
+      }
+      header nav {
+        margin-top: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      #kids td {
+        display: block;
+        width: 100%;
+        padding: 10px;
+      }
+      .product-card {
+        width: 100%;
+        max-width: 350px;
+        margin: 10px auto;
+      }
+      .cart-modal, .wishlist-modal {
+        width: 80%;
+      }
+      .checkout-modal {
+        width: 90%;
+      }
+    }
+    
+    /* Hide sections by default */
+    .section {
+      display: none;
+    }
+    .section.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="https://i.pinimg.com/736x/58/3b/f1/583bf1744b9419813a94323c68f23df9.jpg" style="height: 65px; border-radius: 5px;" alt="FashionHub Logo" />
+    <div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 0 20px;">
+      <input type="text" id="textinput" placeholder="Search for products..." style="padding: 10px; width: 300px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px;">
+      <button style="padding: 10px 15px; margin-left: 10px; border-radius: 5px; border: none; background-color: black; color: white; cursor: pointer;">SEARCH</button>
+    </div>
+    <nav style="display: flex; gap: 20px; align-items: center;">
+      <h4 style="margin: 0; cursor: pointer;" onclick="showSection('home')">HOME</h4>
+      <h4 style="margin: 0; cursor: pointer;" onclick="showSection('kids')">KIDS</h4>
+      <h4 style="margin: 0; cursor: pointer;" onclick="showSection('men')">MEN</h4>
+      <h4 style="margin: 0; cursor: pointer;" onclick="showSection('women')">WOMEN</h4>
+      <h4 style="margin: 0; cursor: pointer;">BRANDS</h4>
+      <h4 style="margin: 0; cursor: pointer;">OFFERS</h4>
+      <h4 id="wishlistBtn" style="margin: 0; cursor: pointer; position: relative;">
+        WISHLIST (<span id="wishlistCount">0</span>)
+      </h4>
+      <h4 id="bagBtn" style="margin: 0; cursor: pointer; position: relative;">
+        BAG (<span id="cartCount">0</span>)
+      </h4>
+    </nav>
+  </header>
+  
+  <div class="overlay" id="overlay"></div>
+  
+  <!-- Cart Modal -->
+  <div class="cart-modal" id="cartModal">
+    <span class="close-cart" id="closeCart">&times;</span>
+    <h2>Your Shopping Bag</h2>
+    <div id="cartItems"></div>
+    <div id="cartTotal" style="font-weight: bold; margin-top: 20px;"></div>
+    <button id="checkoutBtn" style="padding: 10px 20px; background-color: black; color: white; border: none; border-radius: 5px; margin-top: 20px; cursor: pointer;">CHECKOUT</button>
+  </div>
+  
+  <!-- Wishlist Modal -->
+  <div class="wishlist-modal" id="wishlistModal">
+    <span class="close-wishlist" id="closeWishlist">&times;</span>
+    <h2>Your Wishlist</h2>
+    <div id="wishlistItems"></div>
+  </div>
+  
+  <!-- Checkout Modal -->
+  <div class="checkout-modal" id="checkoutModal">
+    <h2>Checkout</h2>
+    <form id="checkoutForm">
+      <input type="text" placeholder="Full Name" required>
+      <input type="email" placeholder="Email" required>
+      <input type="text" placeholder="Address" required>
+      <input type="text" placeholder="City" required>
+      <input type="text" placeholder="Zip Code" required>
+      <input type="text" placeholder="Card Number" required>
+      <input type="text" placeholder="Expiry Date" required>
+      <input type="text" placeholder="CVV" required>
+      <button type="submit">PLACE ORDER</button>
+      <button type="button" id="cancelCheckout" style="background-color: #ccc; margin-left: 10px;">CANCEL</button>
+    </form>
+  </div>
+  
+  <div id="home" class="section active">
+    <h1 class="product-title">MEN'S COLLECTION</h1>
+    <table id="men" style="width: 100%; border-collapse: collapse; background-color: rgb(240, 244, 246);">
+      <tr>
+        <td style="text-align: center; padding: 10px;">
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('URBAN Men\'s Winter Jacket', 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 3499)">♥</button>
+            <img src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" style="width: 100%; height: 400px; object-fit: cover;">
+            <div class="product-info">
+              <div class="product-name"><b>URBAN</b> Men's Winter Jacket</div>
+              <div class="product-price">₹3,499</div>
+              <div class="product-popularity">+1200 bought this week</div>
+              <button onclick="addToCart('URBAN Men\'s Winter Jacket', 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 3499)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+        <td style="text-align: center; padding: 10px;">
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('CLASSIC Formal Shirt', 'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1299)">♥</button>
+            <img src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" style="width: 100%; height: 400px; object-fit: cover;">
+            <div class="product-info">
+              <div class="product-name"><b>CLASSIC</b> T shirt</div>
+              <div class="product-price">₹1,299</div>
+              <div class="product-popularity">850+ bought today</div>
+              <button onclick="addToCart('CLASSIC Formal Shirt', 'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1299)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+        <td style="text-align: center; padding: 10px;">
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('DENIM Slim Fit Jeans', 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1999)">♥</button>
+            <img src="https://images.unsplash.com/photo-1473966968600-fa801b869a1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" style="width: 100%; height: 400px; object-fit: cover;">
+            <div class="product-info">
+              <div class="product-name"><b>DENIM</b> Slim Formal pant</div>
+              <div class="product-price">₹1,999</div>
+              <div class="product-popularity">600+ bought today</div>
+              <button onclick="addToCart('DENIM Slim Fit Jeans', 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1999)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+        <td style="text-align: center; padding: 10px;">
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('SPORT Running Shoes', 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2999)">♥</button>
+            <img src="https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" style="width: 100%; height: 400px; object-fit: cover;">
+            <div class="product-info">
+              <div class="product-name"><b>SPORT</b> Running Shoes</div>
+              <div class="product-price">₹2,999</div>
+              <div class="product-popularity">+1500 bought today</div>
+              <button onclick="addToCart('SPORT Running Shoes', 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2999)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+    
+    <h1 class="product-title">WOMEN'S COLLECTION</h1>
+    <table id="women" style="width: 100%; border-collapse: collapse; background-color: rgb(240, 244, 246);">
+      <tr>
+        <td style="text-align: center; padding: 10px;">
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('ELEGANCE Summer Dress', 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1599)">♥</button>
+            <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" style="width: 100%; height: 400px; object-fit: cover;">
+            <div class="product-info">
+              <div class="product-name"><b>ELEGANCE</b> Summer Dress</div>
+              <div class="product-price">₹1,599</div>
+              <div class="product-popularity">+1800 bought today</div>
+              <button onclick="addToCart('ELEGANCE Summer Dress', 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1599)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+        <td style="text-align: center; padding: 10px;">
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('CHIC Leather Handbag', 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2499)">♥</button>
+            <img src="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" style="width: 100%; height: 400px; object-fit: cover;">
+            <div class="product-info">
+              <div class="product-name"><b>CHIC</b> Leather Handbag</div>
+              <div class="product-price">₹2,499</div>
+              <div class="product-popularity">1200+ bought today</div>
+              <button onclick="addToCart('CHIC Leather Handbag', 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2499)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+        <td style="text-align: center; padding: 10px;">
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('STYLE High-Waist Jeans', 'https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1799)">♥</button>
+            <img src="https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" style="width: 100%; height: 400px; object-fit: cover;">
+            <div class="product-info">
+              <div class="product-name"><b>STYLE</b> High-Waist Jeans</div>
+              <div class="product-price">₹1,799</div>
+              <div class="product-popularity">900+ bought today</div>
+              <button onclick="addToCart('STYLE High-Waist Jeans', 'https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1799)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+        <td style="text-align: center; padding: 10px;">
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('GLAM High Heels', 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2299)">♥</button>
+            <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" style="width: 100%; height: 400px; object-fit: cover;">
+            <div class="product-info">
+              <div class="product-name"><b>GLAM</b> Shoes</div>
+              <div class="product-price">₹2,299</div>
+              <div class="product-popularity">+1500 bought today</div>
+              <button onclick="addToCart('GLAM High Heels', 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2299)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <h1 class="product-title">KIDS COLLECTION</h1>
+    <table id="kids">
+      <tr>
+        <td>
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('LITTLE STAR Boys T-Shirt Set', 'https://assets.ajio.com/medias/sys_master/root/20250530/5eD7/6839c3bc55340d4b4f7134b0/-473Wx593H-701651610-aqua-MODEL.jpg', 799)">♥</button>
+            <img src="https://assets.ajio.com/medias/sys_master/root/20250530/5eD7/6839c3bc55340d4b4f7134b0/-473Wx593H-701651610-aqua-MODEL.jpg" alt="Kids T-Shirt Set">
+            <div class="product-info">
+              <div class="product-name"><b>LITTLE STAR</b> Boys T-Shirt Set</div>
+              <div class="product-price">₹799</div>
+              <div class="product-popularity">+450 bought today</div>
+              <button onclick="addToCart('LITTLE STAR Boys T-Shirt Set', 'https://assets.ajio.com/medias/sys_master/root/20250530/5eD7/6839c3bc55340d4b4f7134b0/-473Wx593H-701651610-aqua-MODEL.jpg', 799)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('PRETTY Girls Floral Dress', 'https://assets.ajio.com/medias/sys_master/root/20250608/MvdT/6845a85a55340d4b4f9195f5/-473Wx593H-701702784-multi-MODEL.jpg', 999)">♥</button>
+            <img src="https://assets.ajio.com/medias/sys_master/root/20250608/MvdT/6845a85a55340d4b4f9195f5/-473Wx593H-701702784-multi-MODEL.jpg" alt="Girls Floral Dress">
+            <div class="product-info">
+              <div class="product-name"><b>PRETTY</b> Girls Floral Dress</div>
+              <div class="product-price">₹999</div>
+              <div class="product-popularity">600+ bought today</div>
+              <button onclick="addToCart('PRETTY Girls Floral Dress', 'https://assets.ajio.com/medias/sys_master/root/20250608/MvdT/6845a85a55340d4b4f9195f5/-473Wx593H-701702784-multi-MODEL.jpg', 999)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('COMFY Kids Hoodie Set', 'https://assets.ajio.com/medias/sys_master/root/20250130/fGYj/679b441fbc78b543a90a16bc/-473Wx593H-701132965-blue-MODEL.jpg', 1199)">♥</button>
+            <img src="https://assets.ajio.com/medias/sys_master/root/20250130/fGYj/679b441fbc78b543a90a16bc/-473Wx593H-701132965-blue-MODEL.jpg" alt="Kids Hoodie Set">
+            <div class="product-info">
+              <div class="product-name"><b>COMFY</b> Kids Hoodie Set</div>
+              <div class="product-price">₹1,199</div>
+              <div class="product-popularity">350+ bought today</div>
+              <button onclick="addToCart('COMFY Kids Hoodie Set', 'https://assets.ajio.com/medias/sys_master/root/20250130/fGYj/679b441fbc78b543a90a16bc/-473Wx593H-701132965-blue-MODEL.jpg', 1199)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('JUMPY Kids Sneakers', 'https://assets.ajio.com/medias/sys_master/root/20250623/tB3y/685961020f920c69cc495dec/-473Wx593H-701802341-grey-MODEL.jpg', 1499)">♥</button>
+            <img src="https://assets.ajio.com/medias/sys_master/root/20250623/tB3y/685961020f920c69cc495dec/-473Wx593H-701802341-grey-MODEL.jpg" alt="Kids Sneakers">
+            <div class="product-info">
+              <div class="product-name"><b>JUMPY</b> shirt and pant set</div>
+              <div class="product-price">₹1,499</div>
+              <div class="product-popularity">+550 bought today</div>
+              <button onclick="addToCart('JUMPY Kids Sneakers', 'https://assets.ajio.com/medias/sys_master/root/20250623/tB3y/685961020f920c69cc495dec/-473Wx593H-701802341-grey-MODEL.jpg', 1499)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div id="men" class="section">
+    <h1 class="product-title">MEN'S COLLECTION</h1>
+    <table style="width: 100%; border-collapse: collapse; background-color: rgb(240, 244, 246);">
+      <tr>
+        <td style="text-align: center; padding: 10px;">
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('URBAN Men\'s Winter Jacket', 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 3499)">♥</button>
+            <img src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" style="width: 100%; height: 400px; object-fit: cover;">
+            <div class="product-info">
+              <div class="product-name"><b>URBAN</b> Men's Winter Jacket</div>
+              <div class="product-price">₹3,499</div>
+              <div class="product-popularity">+1200 bought this week</div>
+              <button onclick="addToCart('URBAN Men\'s Winter Jacket', 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 3499)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+        <td style="text-align: center; padding: 10px;">
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('CLASSIC Formal Shirt', 'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1299)">♥</button>
+            <img src="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" style="width: 100%; height: 400px; object-fit: cover;">
+            <div class="product-info">
+              <div class="product-name"><b>CLASSIC</b> T shirt</div>
+              <div class="product-price">₹1,299</div>
+              <div class="product-popularity">850+ bought today</div>
+              <button onclick="addToCart('CLASSIC Formal Shirt', 'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1299)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+        <td style="text-align: center; padding: 10px;">
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('DENIM Slim Fit Jeans', 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1999)">♥</button>
+            <img src="https://images.unsplash.com/photo-1473966968600-fa801b869a1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" style="width: 100%; height: 400px; object-fit: cover;">
+            <div class="product-info">
+              <div class="product-name"><b>DENIM</b> Slim Formal pant</div>
+              <div class="product-price">₹1,999</div>
+              <div class="product-popularity">600+ bought today</div>
+              <button onclick="addToCart('DENIM Slim Fit Jeans', 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1999)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+        <td style="text-align: center; padding: 10px;">
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('SPORT Running Shoes', 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2999)">♥</button>
+            <img src="https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" style="width: 100%; height: 400px; object-fit: cover;">
+            <div class="product-info">
+              <div class="product-name"><b>SPORT</b> Running Shoes</div>
+              <div class="product-price">₹2,999</div>
+              <div class="product-popularity">+1500 bought today</div>
+              <button onclick="addToCart('SPORT Running Shoes', 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2999)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div id="women" class="section">
+    <h1 class="product-title">WOMEN'S COLLECTION</h1>
+    <table style="width: 100%; border-collapse: collapse; background-color: rgb(240, 244, 246);">
+      <tr>
+        <td style="text-align: center; padding: 10px;">
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('ELEGANCE Summer Dress', 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1599)">♥</button>
+            <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" style="width: 100%; height: 400px; object-fit: cover;">
+            <div class="product-info">
+              <div class="product-name"><b>ELEGANCE</b> Summer Dress</div>
+              <div class="product-price">₹1,599</div>
+              <div class="product-popularity">+1800 bought today</div>
+              <button onclick="addToCart('ELEGANCE Summer Dress', 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1599)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+        <td style="text-align: center; padding: 10px;">
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('CHIC Leather Handbag', 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2499)">♥</button>
+            <img src="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" style="width: 100%; height: 400px; object-fit: cover;">
+            <div class="product-info">
+              <div class="product-name"><b>CHIC</b> Leather Handbag</div>
+              <div class="product-price">₹2,499</div>
+              <div class="product-popularity">1200+ bought today</div>
+              <button onclick="addToCart('CHIC Leather Handbag', 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2499)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+        <td style="text-align: center; padding: 10px;">
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('STYLE High-Waist Jeans', 'https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1799)">♥</button>
+            <img src="https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" style="width: 100%; height: 400px; object-fit: cover;">
+            <div class="product-info">
+              <div class="product-name"><b>STYLE</b> High-Waist Jeans</div>
+              <div class="product-price">₹1,799</div>
+              <div class="product-popularity">900+ bought today</div>
+              <button onclick="addToCart('STYLE High-Waist Jeans', 'https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1799)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+        <td style="text-align: center; padding: 10px;">
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('GLAM High Heels', 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2299)">♥</button>
+            <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" style="width: 100%; height: 400px; object-fit: cover;">
+            <div class="product-info">
+              <div class="product-name"><b>GLAM</b> Shoes</div>
+              <div class="product-price">₹2,299</div>
+              <div class="product-popularity">+1500 bought today</div>
+              <button onclick="addToCart('GLAM High Heels', 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2299)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div id="kids" class="section">
+    <h1 class="product-title">KIDS COLLECTION</h1>
+    <table style="width: 100%; border-collapse: collapse; background-color: rgb(240, 244, 246);">
+      <tr>
+        <td style="text-align: center; padding: 10px;">
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('LITTLE STAR Boys T-Shirt Set', 'https://assets.ajio.com/medias/sys_master/root/20250530/5eD7/6839c3bc55340d4b4f7134b0/-473Wx593H-701651610-aqua-MODEL.jpg', 799)">♥</button>
+            <img src="https://assets.ajio.com/medias/sys_master/root/20250530/5eD7/6839c3bc55340d4b4f7134b0/-473Wx593H-701651610-aqua-MODEL.jpg" alt="Kids T-Shirt Set">
+            <div class="product-info">
+              <div class="product-name"><b>LITTLE STAR</b> Boys T-Shirt Set</div>
+              <div class="product-price">₹799</div>
+              <div class="product-popularity">+450 bought today</div>
+              <button onclick="addToCart('LITTLE STAR Boys T-Shirt Set', 'https://assets.ajio.com/medias/sys_master/root/20250530/5eD7/6839c3bc55340d4b4f7134b0/-473Wx593H-701651610-aqua-MODEL.jpg', 799)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+        <td style="text-align: center; padding: 10px;">
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('PRETTY Girls Floral Dress', 'https://assets.ajio.com/medias/sys_master/root/20250608/MvdT/6845a85a55340d4b4f9195f5/-473Wx593H-701702784-multi-MODEL.jpg', 999)">♥</button>
+            <img src="https://assets.ajio.com/medias/sys_master/root/20250608/MvdT/6845a85a55340d4b4f9195f5/-473Wx593H-701702784-multi-MODEL.jpg" alt="Girls Floral Dress">
+            <div class="product-info">
+              <div class="product-name"><b>PRETTY</b> Girls Floral Dress</div>
+              <div class="product-price">₹999</div>
+              <div class="product-popularity">600+ bought today</div>
+              <button onclick="addToCart('PRETTY Girls Floral Dress', 'https://assets.ajio.com/medias/sys_master/root/20250608/MvdT/6845a85a55340d4b4f9195f5/-473Wx593H-701702784-multi-MODEL.jpg', 999)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+        <td style="text-align: center; padding: 10px;">
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('COMFY Kids Hoodie Set', 'https://assets.ajio.com/medias/sys_master/root/20250130/fGYj/679b441fbc78b543a90a16bc/-473Wx593H-701132965-blue-MODEL.jpg', 1199)">♥</button>
+            <img src="https://assets.ajio.com/medias/sys_master/root/20250130/fGYj/679b441fbc78b543a90a16bc/-473Wx593H-701132965-blue-MODEL.jpg" alt="Kids Hoodie Set">
+            <div class="product-info">
+              <div class="product-name"><b>COMFY</b> Kids Hoodie Set</div>
+              <div class="product-price">₹1,199</div>
+              <div class="product-popularity">350+ bought today</div>
+              <button onclick="addToCart('COMFY Kids Hoodie Set', 'https://assets.ajio.com/medias/sys_master/root/20250130/fGYj/679b441fbc78b543a90a16bc/-473Wx593H-701132965-blue-MODEL.jpg', 1199)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+        <td style="text-align: center; padding: 10px;">
+          <div class="product-card">
+            <button class="wishlist-btn" onclick="toggleWishlist('JUMPY Kids Sneakers', 'https://assets.ajio.com/medias/sys_master/root/20250623/tB3y/685961020f920c69cc495dec/-473Wx593H-701802341-grey-MODEL.jpg', 1499)">♥</button>
+            <img src="https://assets.ajio.com/medias/sys_master/root/20250623/tB3y/685961020f920c69cc495dec/-473Wx593H-701802341-grey-MODEL.jpg" alt="Kids Sneakers">
+            <div class="product-info">
+              <div class="product-name"><b>JUMPY</b> shirt and pant set</div>
+              <div class="product-price">₹1,499</div>
+              <div class="product-popularity">+550 bought today</div>
+              <button onclick="addToCart('JUMPY Kids Sneakers', 'https://assets.ajio.com/medias/sys_master/root/20250623/tB3y/685961020f920c69cc495dec/-473Wx593H-701802341-grey-MODEL.jpg', 1499)" class="add-to-cart">ADD TO BAG</button>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <script>
+    let cart = [];
+    let wishlist = [];
+    
+    // Show specific section and hide others
+    function showSection(sectionId) {
+      document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active');
+      });
+      document.getElementById(sectionId).classList.add('active');
+    }
+    
+    // Add item to cart
+    function addToCart(name, image, price) {
+      cart.push({ name, image, price });
+      updateCartCount();
+      alert(`${name} added to cart!`);
+    }
+    
+    // Toggle item in wishlist
+    function toggleWishlist(name, image, price) {
+      const index = wishlist.findIndex(item => item.name === name);
+      const btn = event.target;
+      
+      if (index === -1) {
+        wishlist.push({ name, image, price });
+        btn.classList.add('active');
+        alert(`${name} added to wishlist!`);
+      } else {
+        wishlist.splice(index, 1);
+        btn.classList.remove('active');
+        alert(`${name} removed from wishlist!`);
+      }
+      
+      updateWishlistCount();
+    }
+    
+    // Update cart count display
+    function updateCartCount() {
+      document.getElementById('cartCount').textContent = cart.length;
+    }
+    
+    // Update wishlist count display
+    function updateWishlistCount() {
+      document.getElementById('wishlistCount').textContent = wishlist.length;
+    }
+  
+    // Display cart items
+    function displayCart() {
+      const cartItems = document.getElementById('cartItems');
+      const cartTotal = document.getElementById('cartTotal');
+      
+      if (cart.length === 0) {
+        cartItems.innerHTML = '<p>Your bag is empty</p>';
+        cartTotal.textContent = '';
+        return;
+      }
+      
+      cartItems.innerHTML = '';
+      let total = 0;
+      
+      cart.forEach((item, index) => {
+        total += item.price;
+        
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'cart-item';
+        itemDiv.innerHTML = `
+          <img src="${item.image}" alt="${item.name}">
+          <div>
+            <h4>${item.name}</h4>
+            <p>₹${item.price}</p>
+          </div>
+          <button class="remove-item" onclick="removeFromCart(${index})">Remove</button>
+        `;
+        
+        cartItems.appendChild(itemDiv);
+      });
+      
+      cartTotal.textContent = `Total: ₹${total}`;
+    }
+    
+    // Display wishlist items
+    function displayWishlist() {
+      const wishlistItems = document.getElementById('wishlistItems');
+      
+      if (wishlist.length === 0) {
+        wishlistItems.innerHTML = '<p>Your wishlist is empty</p>';
+        return;
+      }
+      
+      wishlistItems.innerHTML = '';
+      
+      wishlist.forEach((item, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'wishlist-item';
+        itemDiv.innerHTML = `
+          <img src="${item.image}" alt="${item.name}">
+          <div>
+            <h4>${item.name}</h4>
+            <p>₹${item.price}</p>
+            <button class="move-to-cart" onclick="moveToCart(${index})">Add to Bag</button>
+          </div>
+          <button class="remove-item" onclick="removeFromWishlist(${index})">Remove</button>
+        `;
+        
+        wishlistItems.appendChild(itemDiv);
+      });
+    }
+    
+    // Remove item from cart
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      updateCartCount();
+      displayCart();
+    }
+    
+    // Remove item from wishlist
+    function removeFromWishlist(index) {
+      wishlist.splice(index, 1);
+      updateWishlistCount();
+      displayWishlist();
+    }
+    
+    // Move item from wishlist to cart
+    function moveToCart(index) {
+      const item = wishlist[index];
+      addToCart(item.name, item.image, item.price);
+      removeFromWishlist(index);
+    }
+    
+    // Checkout functionality
+    function checkout() {
+      if (cart.length === 0) {
+        alert('Your cart is empty!');
+        return;
+      }
+      
+      document.getElementById('checkoutModal').style.display = 'block';
+      document.getElementById('overlay').style.display = 'block';
+    }
+    
+    // Event listeners
+    document.getElementById('bagBtn').addEventListener('click', function() {
+      document.getElementById('overlay').style.display = 'block';
+      document.getElementById('cartModal').style.display = 'block';
+      displayCart();
+    });
+    
+    document.getElementById('wishlistBtn').addEventListener('click', function() {
+      document.getElementById('overlay').style.display = 'block';
+      document.getElementById('wishlistModal').style.display = 'block';
+      displayWishlist();
+    });
+    
+    document.getElementById('closeCart').addEventListener('click', function() {
+      document.getElementById('overlay').style.display = 'none';
+      document.getElementById('cartModal').style.display = 'none';
+    });
+    
+    document.getElementById('closeWishlist').addEventListener('click', function() {
+      document.getElementById('overlay').style.display = 'none';
+      document.getElementById('wishlistModal').style.display = 'none';
+    });
+    
+    document.getElementById('overlay').addEventListener('click', function() {
+      document.getElementById('overlay').style.display = 'none';
+      document.getElementById('cartModal').style.display = 'none';
+      document.getElementById('wishlistModal').style.display = 'none';
+      document.getElementById('checkoutModal').style.display = 'none';
+    });
+    
+    document.getElementById('checkoutBtn').addEventListener('click', checkout);
+    
+    document.getElementById('cancelCheckout').addEventListener('click', function() {
+      document.getElementById('checkoutModal').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+    });
+    
+    document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Order placed successfully! Thank you for your purchase.');
+      cart = [];
+      updateCartCount();
+      document.getElementById('checkoutModal').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+      document.getElementById('cartModal').style.display = 'none';
+    });
+  </script>
+  
+</body>
+</html>
