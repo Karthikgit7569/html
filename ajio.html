@@ -116,6 +116,28 @@
     .add-to-cart:hover {
       background-color: #0d1442;
     }
+    .buy-now {
+      padding: 8px 15px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      width: 100%;
+      transition: background 0.3s;
+      margin-top: 5px;
+    }
+    .buy-now:hover {
+      background-color: #3e8e41;
+    }
+    .button-group {
+      display: flex;
+      gap: 10px;
+    }
+    .button-group button {
+      flex: 1;
+    }
     .wishlist-btn {
       position: absolute;
       top: 10px;
@@ -155,8 +177,6 @@
       cursor: pointer;
       font-size: 12px;
     }
-    
-    /* Kids Section Styles */
     #kids {
       width: 100%;
       border-collapse: collapse;
@@ -166,10 +186,13 @@
       text-align: center;
       padding: 15px;
       vertical-align: top;
+      width: 25%;
     }
     #kids .product-card {
       background-color: #fff;
       border: 1px solid #e0e0e0;
+      width: 100%;
+      max-width: 280px;
     }
     #kids .product-name {
       color: #333;
@@ -181,14 +204,12 @@
     #kids .product-popularity {
       color: #4CAF50;
     }
-    #kids img {
+    #kids .product-card img {
       width: 100%;
-      height: 400px;
+      height: 300px;
       object-fit: cover;
       background-color: #f5f5f5;
     }
-    
-    /* Checkout Modal */
     .checkout-modal {
       display: none;
       position: fixed;
@@ -221,8 +242,107 @@
       cursor: pointer;
       margin-top: 10px;
     }
-    
-    /* Responsive adjustments */
+    .confirmation-modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 400px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      z-index: 1002;
+      text-align: center;
+    }
+    .confirmation-modal h2 {
+      color: #4CAF50;
+      margin-top: 0;
+    }
+    .confirmation-modal button {
+      padding: 10px 20px;
+      background-color: #1a237e;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    footer {
+      background-color: #f8f8f8;
+      padding: 40px 0;
+      font-family: 'Roboto', sans-serif;
+      margin-top: 50px;
+    }
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .footer-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 30px;
+      margin-bottom: 30px;
+    }
+    .footer-column {
+      flex: 1;
+      min-width: 200px;
+      margin-bottom: 20px;
+    }
+    .footer-column h3 {
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 15px;
+    }
+    .footer-column ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .footer-column li {
+      margin-bottom: 8px;
+    }
+    .footer-column a {
+      text-decoration: none;
+      color: #666;
+      font-size: 14px;
+    }
+    .footer-column a:hover {
+      color: #1a237e;
+    }
+    .footer-bottom {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .payment-methods {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .payment-methods img {
+      height: 30px;
+    }
+    .social-media {
+      display: flex;
+      gap: 15px;
+    }
+    .social-media a {
+      color: #666;
+      font-size: 20px;
+    }
+    .copyright {
+      width: 100%;
+      text-align: center;
+      margin-top: 20px;
+      color: #666;
+      font-size: 14px;
+    }
     @media (max-width: 1200px) {
       .product-card {
         width: 250px;
@@ -256,12 +376,19 @@
       .cart-modal, .wishlist-modal {
         width: 80%;
       }
-      .checkout-modal {
+      .wishlist-modal {
+        right: 0;
+      }
+      .checkout-modal, .confirmation-modal {
         width: 90%;
       }
+      .button-group {
+        flex-direction: column;
+      }
+      .footer-column {
+        min-width: 150px;
+      }
     }
-    
-    /* Hide sections by default */
     .section {
       display: none;
     }
@@ -296,7 +423,6 @@
   
   <div class="overlay" id="overlay"></div>
   
-  <!-- Cart Modal -->
   <div class="cart-modal" id="cartModal">
     <span class="close-cart" id="closeCart">&times;</span>
     <h2>Your Shopping Bag</h2>
@@ -305,14 +431,12 @@
     <button id="checkoutBtn" style="padding: 10px 20px; background-color: black; color: white; border: none; border-radius: 5px; margin-top: 20px; cursor: pointer;">CHECKOUT</button>
   </div>
   
-  <!-- Wishlist Modal -->
   <div class="wishlist-modal" id="wishlistModal">
     <span class="close-wishlist" id="closeWishlist">&times;</span>
     <h2>Your Wishlist</h2>
     <div id="wishlistItems"></div>
   </div>
   
-  <!-- Checkout Modal -->
   <div class="checkout-modal" id="checkoutModal">
     <h2>Checkout</h2>
     <form id="checkoutForm">
@@ -329,9 +453,17 @@
     </form>
   </div>
   
+  <div class="confirmation-modal" id="confirmationModal">
+    <h2>Order Confirmed!</h2>
+    <p>Thank you for your purchase.</p>
+    <p>Your order has been placed successfully.</p>
+    <p>Order ID: <span id="orderId"></span></p>
+    <button id="continueShopping">CONTINUE SHOPPING</button>
+  </div>
+  
   <div id="home" class="section active">
     <h1 class="product-title">MEN'S COLLECTION</h1>
-    <table id="men" style="width: 100%; border-collapse: collapse; background-color: rgb(240, 244, 246);">
+    <table class="men-collection" style="width: 100%; border-collapse: collapse; background-color: rgb(240, 244, 246);">
       <tr>
         <td style="text-align: center; padding: 10px;">
           <div class="product-card">
@@ -341,7 +473,10 @@
               <div class="product-name"><b>URBAN</b> Men's Winter Jacket</div>
               <div class="product-price">₹3,499</div>
               <div class="product-popularity">+1200 bought this week</div>
-              <button onclick="addToCart('URBAN Men\'s Winter Jacket', 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 3499)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('URBAN Men\'s Winter Jacket', 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 3499)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('URBAN Men\'s Winter Jacket', 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 3499)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -353,7 +488,10 @@
               <div class="product-name"><b>CLASSIC</b> T shirt</div>
               <div class="product-price">₹1,299</div>
               <div class="product-popularity">850+ bought today</div>
-              <button onclick="addToCart('CLASSIC Formal Shirt', 'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1299)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('CLASSIC Formal Shirt', 'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1299)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('CLASSIC Formal Shirt', 'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1299)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -365,7 +503,10 @@
               <div class="product-name"><b>DENIM</b> Slim Formal pant</div>
               <div class="product-price">₹1,999</div>
               <div class="product-popularity">600+ bought today</div>
-              <button onclick="addToCart('DENIM Slim Fit Jeans', 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1999)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('DENIM Slim Fit Jeans', 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1999)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('DENIM Slim Fit Jeans', 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1999)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -377,7 +518,10 @@
               <div class="product-name"><b>SPORT</b> Running Shoes</div>
               <div class="product-price">₹2,999</div>
               <div class="product-popularity">+1500 bought today</div>
-              <button onclick="addToCart('SPORT Running Shoes', 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2999)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('SPORT Running Shoes', 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2999)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('SPORT Running Shoes', 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2999)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -385,7 +529,7 @@
     </table>
     
     <h1 class="product-title">WOMEN'S COLLECTION</h1>
-    <table id="women" style="width: 100%; border-collapse: collapse; background-color: rgb(240, 244, 246);">
+    <table class="women-collection" style="width: 100%; border-collapse: collapse; background-color: rgb(240, 244, 246);">
       <tr>
         <td style="text-align: center; padding: 10px;">
           <div class="product-card">
@@ -395,7 +539,10 @@
               <div class="product-name"><b>ELEGANCE</b> Summer Dress</div>
               <div class="product-price">₹1,599</div>
               <div class="product-popularity">+1800 bought today</div>
-              <button onclick="addToCart('ELEGANCE Summer Dress', 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1599)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('ELEGANCE Summer Dress', 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1599)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('ELEGANCE Summer Dress', 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1599)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -407,7 +554,10 @@
               <div class="product-name"><b>CHIC</b> Leather Handbag</div>
               <div class="product-price">₹2,499</div>
               <div class="product-popularity">1200+ bought today</div>
-              <button onclick="addToCart('CHIC Leather Handbag', 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2499)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('CHIC Leather Handbag', 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2499)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('CHIC Leather Handbag', 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2499)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -419,7 +569,10 @@
               <div class="product-name"><b>STYLE</b> High-Waist Jeans</div>
               <div class="product-price">₹1,799</div>
               <div class="product-popularity">900+ bought today</div>
-              <button onclick="addToCart('STYLE High-Waist Jeans', 'https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1799)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('STYLE High-Waist Jeans', 'https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1799)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('STYLE High-Waist Jeans', 'https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1799)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -431,7 +584,10 @@
               <div class="product-name"><b>GLAM</b> Shoes</div>
               <div class="product-price">₹2,299</div>
               <div class="product-popularity">+1500 bought today</div>
-              <button onclick="addToCart('GLAM High Heels', 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2299)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('GLAM High Heels', 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2299)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('GLAM High Heels', 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2299)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -439,9 +595,9 @@
     </table>
 
     <h1 class="product-title">KIDS COLLECTION</h1>
-    <table id="kids">
+    <table class="kids-collection" style="width: 100%; border-collapse: collapse; background-color: rgb(240, 244, 246);">
       <tr>
-        <td>
+        <td style="text-align: center; padding: 10px;">
           <div class="product-card">
             <button class="wishlist-btn" onclick="toggleWishlist('LITTLE STAR Boys T-Shirt Set', 'https://assets.ajio.com/medias/sys_master/root/20250530/5eD7/6839c3bc55340d4b4f7134b0/-473Wx593H-701651610-aqua-MODEL.jpg', 799)">♥</button>
             <img src="https://assets.ajio.com/medias/sys_master/root/20250530/5eD7/6839c3bc55340d4b4f7134b0/-473Wx593H-701651610-aqua-MODEL.jpg" alt="Kids T-Shirt Set">
@@ -449,11 +605,14 @@
               <div class="product-name"><b>LITTLE STAR</b> Boys T-Shirt Set</div>
               <div class="product-price">₹799</div>
               <div class="product-popularity">+450 bought today</div>
-              <button onclick="addToCart('LITTLE STAR Boys T-Shirt Set', 'https://assets.ajio.com/medias/sys_master/root/20250530/5eD7/6839c3bc55340d4b4f7134b0/-473Wx593H-701651610-aqua-MODEL.jpg', 799)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('LITTLE STAR Boys T-Shirt Set', 'https://assets.ajio.com/medias/sys_master/root/20250530/5eD7/6839c3bc55340d4b4f7134b0/-473Wx593H-701651610-aqua-MODEL.jpg', 799)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('LITTLE STAR Boys T-Shirt Set', 'https://assets.ajio.com/medias/sys_master/root/20250530/5eD7/6839c3bc55340d4b4f7134b0/-473Wx593H-701651610-aqua-MODEL.jpg', 799)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
-        <td>
+        <td style="text-align: center; padding: 10px;">
           <div class="product-card">
             <button class="wishlist-btn" onclick="toggleWishlist('PRETTY Girls Floral Dress', 'https://assets.ajio.com/medias/sys_master/root/20250608/MvdT/6845a85a55340d4b4f9195f5/-473Wx593H-701702784-multi-MODEL.jpg', 999)">♥</button>
             <img src="https://assets.ajio.com/medias/sys_master/root/20250608/MvdT/6845a85a55340d4b4f9195f5/-473Wx593H-701702784-multi-MODEL.jpg" alt="Girls Floral Dress">
@@ -461,11 +620,14 @@
               <div class="product-name"><b>PRETTY</b> Girls Floral Dress</div>
               <div class="product-price">₹999</div>
               <div class="product-popularity">600+ bought today</div>
-              <button onclick="addToCart('PRETTY Girls Floral Dress', 'https://assets.ajio.com/medias/sys_master/root/20250608/MvdT/6845a85a55340d4b4f9195f5/-473Wx593H-701702784-multi-MODEL.jpg', 999)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('PRETTY Girls Floral Dress', 'https://assets.ajio.com/medias/sys_master/root/20250608/MvdT/6845a85a55340d4b4f9195f5/-473Wx593H-701702784-multi-MODEL.jpg', 999)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('PRETTY Girls Floral Dress', 'https://assets.ajio.com/medias/sys_master/root/20250608/MvdT/6845a85a55340d4b4f9195f5/-473Wx593H-701702784-multi-MODEL.jpg', 999)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
-        <td>
+        <td style="text-align: center; padding: 10px;">
           <div class="product-card">
             <button class="wishlist-btn" onclick="toggleWishlist('COMFY Kids Hoodie Set', 'https://assets.ajio.com/medias/sys_master/root/20250130/fGYj/679b441fbc78b543a90a16bc/-473Wx593H-701132965-blue-MODEL.jpg', 1199)">♥</button>
             <img src="https://assets.ajio.com/medias/sys_master/root/20250130/fGYj/679b441fbc78b543a90a16bc/-473Wx593H-701132965-blue-MODEL.jpg" alt="Kids Hoodie Set">
@@ -473,11 +635,14 @@
               <div class="product-name"><b>COMFY</b> Kids Hoodie Set</div>
               <div class="product-price">₹1,199</div>
               <div class="product-popularity">350+ bought today</div>
-              <button onclick="addToCart('COMFY Kids Hoodie Set', 'https://assets.ajio.com/medias/sys_master/root/20250130/fGYj/679b441fbc78b543a90a16bc/-473Wx593H-701132965-blue-MODEL.jpg', 1199)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('COMFY Kids Hoodie Set', 'https://assets.ajio.com/medias/sys_master/root/20250130/fGYj/679b441fbc78b543a90a16bc/-473Wx593H-701132965-blue-MODEL.jpg', 1199)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('COMFY Kids Hoodie Set', 'https://assets.ajio.com/medias/sys_master/root/20250130/fGYj/679b441fbc78b543a90a16bc/-473Wx593H-701132965-blue-MODEL.jpg', 1199)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
-        <td>
+        <td style="text-align: center; padding: 10px;">
           <div class="product-card">
             <button class="wishlist-btn" onclick="toggleWishlist('JUMPY Kids Sneakers', 'https://assets.ajio.com/medias/sys_master/root/20250623/tB3y/685961020f920c69cc495dec/-473Wx593H-701802341-grey-MODEL.jpg', 1499)">♥</button>
             <img src="https://assets.ajio.com/medias/sys_master/root/20250623/tB3y/685961020f920c69cc495dec/-473Wx593H-701802341-grey-MODEL.jpg" alt="Kids Sneakers">
@@ -485,7 +650,10 @@
               <div class="product-name"><b>JUMPY</b> shirt and pant set</div>
               <div class="product-price">₹1,499</div>
               <div class="product-popularity">+550 bought today</div>
-              <button onclick="addToCart('JUMPY Kids Sneakers', 'https://assets.ajio.com/medias/sys_master/root/20250623/tB3y/685961020f920c69cc495dec/-473Wx593H-701802341-grey-MODEL.jpg', 1499)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('JUMPY Kids Sneakers', 'https://assets.ajio.com/medias/sys_master/root/20250623/tB3y/685961020f920c69cc495dec/-473Wx593H-701802341-grey-MODEL.jpg', 1499)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('JUMPY Kids Sneakers', 'https://assets.ajio.com/medias/sys_master/root/20250623/tB3y/685961020f920c69cc495dec/-473Wx593H-701802341-grey-MODEL.jpg', 1499)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -505,7 +673,10 @@
               <div class="product-name"><b>URBAN</b> Men's Winter Jacket</div>
               <div class="product-price">₹3,499</div>
               <div class="product-popularity">+1200 bought this week</div>
-              <button onclick="addToCart('URBAN Men\'s Winter Jacket', 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 3499)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('URBAN Men\'s Winter Jacket', 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 3499)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('URBAN Men\'s Winter Jacket', 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 3499)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -517,7 +688,10 @@
               <div class="product-name"><b>CLASSIC</b> T shirt</div>
               <div class="product-price">₹1,299</div>
               <div class="product-popularity">850+ bought today</div>
-              <button onclick="addToCart('CLASSIC Formal Shirt', 'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1299)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('CLASSIC Formal Shirt', 'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1299)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('CLASSIC Formal Shirt', 'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1299)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -529,7 +703,10 @@
               <div class="product-name"><b>DENIM</b> Slim Formal pant</div>
               <div class="product-price">₹1,999</div>
               <div class="product-popularity">600+ bought today</div>
-              <button onclick="addToCart('DENIM Slim Fit Jeans', 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1999)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('DENIM Slim Fit Jeans', 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1999)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('DENIM Slim Fit Jeans', 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1999)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -541,7 +718,10 @@
               <div class="product-name"><b>SPORT</b> Running Shoes</div>
               <div class="product-price">₹2,999</div>
               <div class="product-popularity">+1500 bought today</div>
-              <button onclick="addToCart('SPORT Running Shoes', 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2999)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('SPORT Running Shoes', 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2999)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('SPORT Running Shoes', 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2999)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -561,7 +741,10 @@
               <div class="product-name"><b>ELEGANCE</b> Summer Dress</div>
               <div class="product-price">₹1,599</div>
               <div class="product-popularity">+1800 bought today</div>
-              <button onclick="addToCart('ELEGANCE Summer Dress', 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1599)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('ELEGANCE Summer Dress', 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1599)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('ELEGANCE Summer Dress', 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1599)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -573,7 +756,10 @@
               <div class="product-name"><b>CHIC</b> Leather Handbag</div>
               <div class="product-price">₹2,499</div>
               <div class="product-popularity">1200+ bought today</div>
-              <button onclick="addToCart('CHIC Leather Handbag', 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2499)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('CHIC Leather Handbag', 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2499)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('CHIC Leather Handbag', 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2499)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -585,7 +771,10 @@
               <div class="product-name"><b>STYLE</b> High-Waist Jeans</div>
               <div class="product-price">₹1,799</div>
               <div class="product-popularity">900+ bought today</div>
-              <button onclick="addToCart('STYLE High-Waist Jeans', 'https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1799)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('STYLE High-Waist Jeans', 'https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1799)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('STYLE High-Waist Jeans', 'https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 1799)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -597,7 +786,10 @@
               <div class="product-name"><b>GLAM</b> Shoes</div>
               <div class="product-price">₹2,299</div>
               <div class="product-popularity">+1500 bought today</div>
-              <button onclick="addToCart('GLAM High Heels', 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2299)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('GLAM High Heels', 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2299)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('GLAM High Heels', 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80', 2299)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -617,7 +809,10 @@
               <div class="product-name"><b>LITTLE STAR</b> Boys T-Shirt Set</div>
               <div class="product-price">₹799</div>
               <div class="product-popularity">+450 bought today</div>
-              <button onclick="addToCart('LITTLE STAR Boys T-Shirt Set', 'https://assets.ajio.com/medias/sys_master/root/20250530/5eD7/6839c3bc55340d4b4f7134b0/-473Wx593H-701651610-aqua-MODEL.jpg', 799)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('LITTLE STAR Boys T-Shirt Set', 'https://assets.ajio.com/medias/sys_master/root/20250530/5eD7/6839c3bc55340d4b4f7134b0/-473Wx593H-701651610-aqua-MODEL.jpg', 799)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('LITTLE STAR Boys T-Shirt Set', 'https://assets.ajio.com/medias/sys_master/root/20250530/5eD7/6839c3bc55340d4b4f7134b0/-473Wx593H-701651610-aqua-MODEL.jpg', 799)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -629,7 +824,10 @@
               <div class="product-name"><b>PRETTY</b> Girls Floral Dress</div>
               <div class="product-price">₹999</div>
               <div class="product-popularity">600+ bought today</div>
-              <button onclick="addToCart('PRETTY Girls Floral Dress', 'https://assets.ajio.com/medias/sys_master/root/20250608/MvdT/6845a85a55340d4b4f9195f5/-473Wx593H-701702784-multi-MODEL.jpg', 999)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('PRETTY Girls Floral Dress', 'https://assets.ajio.com/medias/sys_master/root/20250608/MvdT/6845a85a55340d4b4f9195f5/-473Wx593H-701702784-multi-MODEL.jpg', 999)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('PRETTY Girls Floral Dress', 'https://assets.ajio.com/medias/sys_master/root/20250608/MvdT/6845a85a55340d4b4f9195f5/-473Wx593H-701702784-multi-MODEL.jpg', 999)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -641,7 +839,10 @@
               <div class="product-name"><b>COMFY</b> Kids Hoodie Set</div>
               <div class="product-price">₹1,199</div>
               <div class="product-popularity">350+ bought today</div>
-              <button onclick="addToCart('COMFY Kids Hoodie Set', 'https://assets.ajio.com/medias/sys_master/root/20250130/fGYj/679b441fbc78b543a90a16bc/-473Wx593H-701132965-blue-MODEL.jpg', 1199)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('COMFY Kids Hoodie Set', 'https://assets.ajio.com/medias/sys_master/root/20250130/fGYj/679b441fbc78b543a90a16bc/-473Wx593H-701132965-blue-MODEL.jpg', 1199)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('COMFY Kids Hoodie Set', 'https://assets.ajio.com/medias/sys_master/root/20250130/fGYj/679b441fbc78b543a90a16bc/-473Wx593H-701132965-blue-MODEL.jpg', 1199)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -653,7 +854,10 @@
               <div class="product-name"><b>JUMPY</b> shirt and pant set</div>
               <div class="product-price">₹1,499</div>
               <div class="product-popularity">+550 bought today</div>
-              <button onclick="addToCart('JUMPY Kids Sneakers', 'https://assets.ajio.com/medias/sys_master/root/20250623/tB3y/685961020f920c69cc495dec/-473Wx593H-701802341-grey-MODEL.jpg', 1499)" class="add-to-cart">ADD TO BAG</button>
+              <div class="button-group">
+                <button onclick="addToCart('JUMPY Kids Sneakers', 'https://assets.ajio.com/medias/sys_master/root/20250623/tB3y/685961020f920c69cc495dec/-473Wx593H-701802341-grey-MODEL.jpg', 1499)" class="add-to-cart">ADD TO BAG</button>
+                <button onclick="buyNow('JUMPY Kids Sneakers', 'https://assets.ajio.com/medias/sys_master/root/20250623/tB3y/685961020f920c69cc495dec/-473Wx593H-701802341-grey-MODEL.jpg', 1499)" class="buy-now">BUY NOW</button>
+              </div>
             </div>
           </div>
         </td>
@@ -661,11 +865,75 @@
     </table>
   </div>
 
+  <footer>
+    <div class="footer-container">
+      <div class="footer-top">
+        <div class="footer-column">
+          <h3>CUSTOMER SERVICE</h3>
+          <ul>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Shipping Policy</a></li>
+            <li><a href="#">Returns & Exchanges</a></li>
+            <li><a href="#">Track Order</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>ABOUT US</h3>
+          <ul>
+            <li><a href="#">Our Story</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Terms & Conditions</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Blog</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>SHOP</h3>
+          <ul>
+            <li><a href="#">Men</a></li>
+            <li><a href="#">Women</a></li>
+            <li><a href="#">Kids</a></li>
+            <li><a href="#">New Arrivals</a></li>
+            <li><a href="#">Best Sellers</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>FOLLOW US</h3>
+          <ul>
+            <li><a href="#">Facebook</a></li>
+            <li><a href="#">Instagram</a></li>
+            <li><a href="#">Twitter</a></li>
+            <li><a href="#">Pinterest</a></li>
+            <li><a href="#">YouTube</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="payment-methods">
+          <img src="https://via.placeholder.com/50x30?text=VISA" alt="Visa">
+          <img src="https://via.placeholder.com/50x30?text=MC" alt="Mastercard">
+          <img src="https://via.placeholder.com/50x30?text=AMEX" alt="American Express">
+          <img src="https://via.placeholder.com/50x30?text=PP" alt="PayPal">
+          <img src="https://via.placeholder.com/50x30?text=UPI" alt="UPI">
+        </div>
+        <div class="social-media">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-pinterest"></i></a>
+        </div>
+        <div class="copyright">
+          <p>© 2023 FashionHub. All Rights Reserved.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
   <script>
     let cart = [];
     let wishlist = [];
     
-    // Show specific section and hide others
     function showSection(sectionId) {
       document.querySelectorAll('.section').forEach(section => {
         section.classList.remove('active');
@@ -673,14 +941,18 @@
       document.getElementById(sectionId).classList.add('active');
     }
     
-    // Add item to cart
     function addToCart(name, image, price) {
       cart.push({ name, image, price });
       updateCartCount();
       alert(`${name} added to cart!`);
     }
     
-    // Toggle item in wishlist
+    function buyNow(name, image, price) {
+      cart = [{ name, image, price }];
+      updateCartCount();
+      checkout();
+    }
+    
     function toggleWishlist(name, image, price) {
       const index = wishlist.findIndex(item => item.name === name);
       const btn = event.target;
@@ -698,17 +970,14 @@
       updateWishlistCount();
     }
     
-    // Update cart count display
     function updateCartCount() {
       document.getElementById('cartCount').textContent = cart.length;
     }
     
-    // Update wishlist count display
     function updateWishlistCount() {
       document.getElementById('wishlistCount').textContent = wishlist.length;
     }
   
-    // Display cart items
     function displayCart() {
       const cartItems = document.getElementById('cartItems');
       const cartTotal = document.getElementById('cartTotal');
@@ -742,7 +1011,6 @@
       cartTotal.textContent = `Total: ₹${total}`;
     }
     
-    // Display wishlist items
     function displayWishlist() {
       const wishlistItems = document.getElementById('wishlistItems');
       
@@ -770,28 +1038,24 @@
       });
     }
     
-    // Remove item from cart
     function removeFromCart(index) {
       cart.splice(index, 1);
       updateCartCount();
       displayCart();
     }
     
-    // Remove item from wishlist
     function removeFromWishlist(index) {
       wishlist.splice(index, 1);
       updateWishlistCount();
       displayWishlist();
     }
     
-    // Move item from wishlist to cart
     function moveToCart(index) {
       const item = wishlist[index];
       addToCart(item.name, item.image, item.price);
       removeFromWishlist(index);
     }
     
-    // Checkout functionality
     function checkout() {
       if (cart.length === 0) {
         alert('Your cart is empty!');
@@ -802,7 +1066,10 @@
       document.getElementById('overlay').style.display = 'block';
     }
     
-    // Event listeners
+    function generateOrderId() {
+      return 'ORD-' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+    }
+    
     document.getElementById('bagBtn').addEventListener('click', function() {
       document.getElementById('overlay').style.display = 'block';
       document.getElementById('cartModal').style.display = 'block';
@@ -830,6 +1097,7 @@
       document.getElementById('cartModal').style.display = 'none';
       document.getElementById('wishlistModal').style.display = 'none';
       document.getElementById('checkoutModal').style.display = 'none';
+      document.getElementById('confirmationModal').style.display = 'none';
     });
     
     document.getElementById('checkoutBtn').addEventListener('click', checkout);
@@ -841,14 +1109,20 @@
     
     document.getElementById('checkoutForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      alert('Order placed successfully! Thank you for your purchase.');
+      const orderId = generateOrderId();
+      document.getElementById('orderId').textContent = orderId;
+      document.getElementById('checkoutModal').style.display = 'none';
+      document.getElementById('confirmationModal').style.display = 'block';
+    });
+    
+    document.getElementById('continueShopping').addEventListener('click', function() {
       cart = [];
       updateCartCount();
-      document.getElementById('checkoutModal').style.display = 'none';
+      document.getElementById('confirmationModal').style.display = 'none';
       document.getElementById('overlay').style.display = 'none';
-      document.getElementById('cartModal').style.display = 'none';
     });
   </script>
-  
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </body>
 </html>

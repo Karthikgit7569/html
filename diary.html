@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FashionHub</title>
+  <style>
+    /* Global Styles */
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    }
+    body { 
+      background-color: #f8f8f8; 
+      color: #333; 
+    }
+    
+    /* Header Styles */
+    header {
+      display: flex; 
+      align-items: center; 
+      gap: 20px; 
+      padding: 10px;
+      background-color: rgb(30, 58, 73); 
+      color: white;
+    }
+    .logo { 
+      height: 65px; 
+      border-radius: 5px; 
+    }
+    .search-box { 
+      flex: 1; 
+      display: flex; 
+      justify-content: center; 
+      padding: 0 20px; 
+    }
+    .search-box input { 
+      padding: 10px; 
+      width: 300px; 
+      border-radius: 5px 0 0 5px; 
+      border: 1px solid #ccc; 
+      font-size: 16px; 
+      border-right: none;
+    }
+    .search-box button { 
+      padding: 10px 15px; 
+      border-radius: 0 5px 5px 0; 
+      border: none; 
+      background-color: black; 
+      color: white; 
+      cursor: pointer;
+    }
+    nav { 
+      display: flex; 
+      gap: 20px; 
+      align-items: center; 
+    }
+    nav h4 { 
+      margin: 0; 
+      cursor: pointer; 
+    }
+    
+    /* Product Styles */
+    .section { 
+      display: none; 
+      padding: 20px; 
+    }
+    .section.active { 
+      display: block; 
+    }
+    .product-title { 
+      font-family: 'Montserrat', sans-serif; 
+      color: #333; 
+      margin: 0 0 20px 10px;
+      font-size: 28px; 
+      font-weight: 600;
+    }
+    .products-grid {
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px; 
+      padding: 10px;
+    }
+    .product-card {
+      background: white; 
+      border-radius: 8px; 
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+      transition: transform 0.3s;
+      position: relative;
+    }
+    .product-card:hover { 
+      transform: translateY(-5px); 
+    }
+    .product-img { 
+      width: 100%; 
+      height: 400px; 
+      object-fit: cover; 
+    }
+    .product-info { 
+      padding: 15px; 
+    }
+    .product-name { 
+      font-size: 16px; 
+      color: #444; 
+      margin-bottom: 8px; 
+    }
+    .product-price { 
+      font-weight: bold; 
+      font-size: 18px; 
+      color: #1E293B; 
+      margin: 5px 0; 
+    }
+    .product-popularity { 
+      color: #4CAF50; 
+      font-size: 14px; 
+      margin: 5px 0; 
+    }
+    .button-group { 
+      display: flex; 
+      gap: 10px; 
+      margin-top: 10px; 
+    }
+    .btn { 
+      padding: 8px; 
+      border: none; 
+      border-radius: 4px; 
+      cursor: pointer;
+      font-weight: 500; 
+      flex: 1; 
+      transition: background 0.3s; 
+      color: white;
+    }
+    .add-to-cart { 
+      background-color: #1a237e; 
+    }
+    .add-to-cart:hover { 
+      background-color: #0d1442; 
+    }
+    .buy-now { 
+      background-color: #4CAF50; 
+    }
+    .buy-now:hover { 
+      background-color: #3e8e41; 
+    }
+    .wishlist-btn {
+      position: absolute; 
+      top: 10px; 
+      right: 10px; 
+      background: white;
+      border: none; 
+      border-radius: 50%; 
+      width: 30px; 
+      height: 30px;
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      cursor: pointer; 
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
+      z-index: 1;
+    }
+    .wishlist-btn.active { 
+      color: red; 
+    }
+    
+    /* Modal Styles */
+    .modal { 
+      display: none; 
+      position: fixed; 
+      top: 0; 
+      right: 0; 
+      width: 350px;
+      height: 100%; 
+      background-color: white; 
+      box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+      z-index: 1000; 
+      padding: 20px; 
+      overflow-y: auto;
+    }
+    .wishlist-modal { 
+      right: 350px; 
+    }
+    .close-btn { 
+      position: absolute; 
+      top: 10px; 
+      right: 10px; 
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .overlay {
+      display: none; 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100%;
+      height: 100%; 
+      background-color: rgba(0,0,0,0.5); 
+      z-index: 999;
+    }
+    .modal-item {
+      display: flex; 
+      margin-bottom: 15px; 
+      border-bottom: 1px solid #eee;
+      padding-bottom: 15px; 
+      position: relative;
+    }
+    .modal-item img { 
+      width: 80px; 
+      height: 100px; 
+      object-fit: cover; 
+      margin-right: 15px; 
+    }
+    .remove-item {
+      position: absolute; 
+      bottom: 10px; 
+      right: 10px; 
+      background: none;
+      border: none; 
+      color: #999; 
+      cursor: pointer; 
+      font-size: 12px;
+    }
+    .move-to-cart {
+      padding: 5px 10px; 
+      background-color: #1a237e; 
+      color: white;
+      border: none; 
+      border-radius: 4px; 
+      cursor: pointer; 
+      margin-top: 5px;
+    }
+    
+    /* Checkout & Confirmation Modals */
+    .center-modal {
+      display: none; 
+      position: fixed; 
+      top: 50%; 
+      left: 50%;
+      transform: translate(-50%, -50%); 
+      width: 400px; 
+      background-color: white;
+      padding: 20px; 
+      border-radius: 8px; 
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      z-index: 1001;
+    }
+    .center-modal h2 { 
+      margin-top: 0; 
+    }
+    .center-modal input {
+      width: 100%; 
+      padding: 10px; 
+      margin: 10px 0; 
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .center-modal button {
+      padding: 10px 15px; 
+      background-color: #1a237e; 
+      color: white;
+      border: none; 
+      border-radius: 4px; 
+      cursor: pointer; 
+      margin-top: 10px;
+    }
+    .confirmation-modal h2 { 
+      color: #4CAF50; 
+    }
+    
+    /* Footer Styles */
+    footer {
+      background-color: #f5f5f5;
+      color: #333;
+      padding: 40px 0 0;
+      margin-top: 40px;
+      font-size: 13px;
+    }
+    .footer-container {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .footer-column h3 {
+      margin-bottom: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: #333;
+    }
+    .footer-column ul {
+      list-style: none;
+      padding: 0;
+    }
+    .footer-column li {
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    .footer-column a {
+      color: #666;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .footer-column a:hover {
+      color: #1a237e;
+      text-decoration: underline;
+    }
+    .footer-bottom {
+      background-color: #ebebeb;
+      padding: 20px 0;
+      margin-top: 40px;
+    }
+    .footer-bottom-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .copyright {
+      color: #666;
+      font-size: 12px;
+    }
+    .payment-methods {
+      display: flex;
+      align-items: center;
+    }
+    .payment-methods img {
+      height: 24px;
+      margin-left: 10px;
+    }
+    .copyright-disclaimer {
+      text-align: center;
+      padding: 15px 0;
+      font-size: 11px;
+      color: #666;
+      border-top: 1px solid #ddd;
+      margin-top: 15px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .copyright-disclaimer p {
+      margin: 5px 0;
+    }
+    .app-download {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .app-download img {
+      height: 40px;
+    }
+    .social-icons {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .social-icons a {
+      color: #666;
+      font-size: 20px;
+      transition: color 0.3s;
+    }
+    .social-icons a:hover {
+      color: #1a237e;
+    }
+    .newsletter {
+      margin-top: 15px;
+    }
+    .newsletter-input {
+      display: flex;
+      margin-top: 10px;
+    }
+    .newsletter-input input {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px 0 0 4px;
+      flex: 1;
+      font-size: 12px;
+    }
+    .newsletter-input button {
+      padding: 8px 12px;
+      background-color: #1a237e;
+      color: white;
+      border: none;
+      border-radius: 0 4px 4px 0;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .footer-logo {
+      height: 40px;
+      margin-bottom: 15px;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+      header { 
+        flex-direction: column; 
+        padding: 15px; 
+      }
+      nav { 
+        margin-top: 15px; 
+        flex-wrap: wrap; 
+        justify-content: center; 
+      }
+      .products-grid { 
+        grid-template-columns: 1fr; 
+      }
+      .product-card { 
+        max-width: 350px; 
+        margin: 0 auto; 
+      }
+      .modal, .center-modal { 
+        width: 90%; 
+      }
+      .wishlist-modal { 
+        right: 0; 
+      }
+      .button-group { 
+        flex-direction: column; 
+      }
+      .footer-container {
+        grid-template-columns: 1fr 1fr;
+      }
+      .footer-bottom-container {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+      }
+      .payment-methods {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .payment-methods img {
+        margin: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Section -->
+  <header>
+    <img src="https://i.pinimg.com/736x/58/3b/f1/583bf1744b9419813a94323c68f23df9.jpg" class="logo" alt="FashionHub Logo">
+    <div class="search-box">
+      <input type="text" id="textinput" placeholder="Search for products...">
+      <button>SEARCH</button>
+    </div>
+    <nav>
+      <h4 onclick="showSection('home')">HOME</h4>
+      <h4 onclick="showSection('kids')">KIDS</h4>
+      <h4 onclick="showSection('men')">MEN</h4>
+      <h4 onclick="showSection('women')">WOMEN</h4>
+      <h4>BRANDS</h4>
+      <h4>OFFERS</h4>
+      <h4 id="wishlistBtn">WISHLIST (<span id="wishlistCount">0</span>)</h4>
+      <h4 id="bagBtn">BAG (<span id="cartCount">0</span>)</h4>
+    </nav>
+  </header>
+  
+  <!-- Modal Overlay -->
+  <div class="overlay" id="overlay"></div>
+  
+  <!-- Cart Modal -->
+  <div class="modal" id="cartModal">
+    <span class="close-btn" id="closeCart">&times;</span>
+    <h2>Your Shopping Bag</h2>
+    <div id="cartItems"></div>
+    <div id="cartTotal" style="font-weight: bold; margin-top: 20px;"></div>
+    <button id="checkoutBtn" class="btn add-to-cart">CHECKOUT</button>
+  </div>
+  
+  <!-- Wishlist Modal -->
+  <div class="modal wishlist-modal" id="wishlistModal">
+    <span class="close-btn" id="closeWishlist">&times;</span>
+    <h2>Your Wishlist</h2>
+    <div id="wishlistItems"></div>
+  </div>
+  
+  <!-- Checkout Modal -->
+  <div class="center-modal" id="checkoutModal">
+    <h2>Checkout</h2>
+    <form id="checkoutForm">
+      <input type="text" placeholder="Full Name" required>
+      <input type="email" placeholder="Email" required>
+      <input type="text" placeholder="Address" required>
+      <input type="text" placeholder="City" required>
+      <input type="text" placeholder="Zip Code" required>
+      <input type="text" placeholder="Card Number" required>
+      <input type="text" placeholder="Expiry Date" required>
+      <input type="text" placeholder="CVV" required>
+      <button type="submit">PLACE ORDER</button>
+      <button type="button" id="cancelCheckout" style="background-color: #ccc; margin-left: 10px;">CANCEL</button>
+    </form>
+  </div>
+  
+  <!-- Order Confirmation Modal -->
+  <div class="center-modal confirmation-modal" id="confirmationModal">
+    <h2>Order Confirmed!</h2>
+    <p>Thank you for your purchase.</p>
+    <p>Your order has been placed successfully.</p>
+    <p>Order ID: <span id="orderId"></span></p>
+    <button id="continueShopping">CONTINUE SHOPPING</button>
+  </div>
+  
+  <!-- Product Sections -->
+  <div id="home" class="section active">
+    <h1 class="product-title">MEN'S COLLECTION</h1>
+    <div class="products-grid">
+      <div class="product-card" data-name="URBAN Men's Winter Jacket" data-img="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" data-price="3499"></div>
+      <div class="product-card" data-name="CLASSIC T shirt" data-img="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" data-price="1299"></div>
+      <div class="product-card" data-name="DENIM Slim Formal pant" data-img="https://images.unsplash.com/photo-1473966968600-fa801b869a1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" data-price="1999"></div>
+      <div class="product-card" data-name="SPORT Running Shoes" data-img="https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" data-price="2999"></div>
+    </div>
+    
+    <h1 class="product-title">WOMEN'S COLLECTION</h1>
+    <div class="products-grid">
+      <div class="product-card" data-name="ELEGANCE Summer Dress" data-img="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" data-price="1599"></div>
+      <div class="product-card" data-name="CHIC Leather Handbag" data-img="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" data-price="2499"></div>
+      <div class="product-card" data-name="STYLE High-Waist Jeans" data-img="https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" data-price="1799"></div>
+      <div class="product-card" data-name="GLAM Shoes" data-img="https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" data-price="2299"></div>
+    </div>
+
+    <h1 class="product-title">KIDS COLLECTION</h1>
+    <div class="products-grid">
+      <div class="product-card" data-name="LITTLE STAR Boys T-Shirt Set" data-img="https://assets.ajio.com/medias/sys_master/root/20250530/5eD7/6839c3bc55340d4b4f7134b0/-473Wx593H-701651610-aqua-MODEL.jpg" data-price="799"></div>
+      <div class="product-card" data-name="PRETTY Girls Floral Dress" data-img="https://assets.ajio.com/medias/sys_master/root/20250608/MvdT/6845a85a55340d4b4f9195f5/-473Wx593H-701702784-multi-MODEL.jpg" data-price="999"></div>
+      <div class="product-card" data-name="COMFY Kids Hoodie Set" data-img="https://assets.ajio.com/medias/sys_master/root/20250130/fGYj/679b441fbc78b543a90a16bc/-473Wx593H-701132965-blue-MODEL.jpg" data-price="1199"></div>
+      <div class="product-card" data-name="JUMPY shirt and pant set" data-img="https://assets.ajio.com/medias/sys_master/root/20250623/tB3y/685961020f920c69cc495dec/-473Wx593H-701802341-grey-MODEL.jpg" data-price="1499"></div>
+    </div>
+  </div>
+
+  <div id="men" class="section">
+    <h1 class="product-title">MEN'S COLLECTION</h1>
+    <div class="products-grid">
+      <div class="product-card" data-name="URBAN Men's Winter Jacket" data-img="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" data-price="3499"></div>
+      <div class="product-card" data-name="CLASSIC T shirt" data-img="https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" data-price="1299"></div>
+      <div class="product-card" data-name="DENIM Slim Formal pant" data-img="https://images.unsplash.com/photo-1473966968600-fa801b869a1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" data-price="1999"></div>
+      <div class="product-card" data-name="SPORT Running Shoes" data-img="https://images.unsplash.com/photo-1600269452121-4f2416e55c28?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" data-price="2999"></div>
+    </div>
+  </div>
+
+  <div id="women" class="section">
+    <h1 class="product-title">WOMEN'S COLLECTION</h1>
+    <div class="products-grid">
+      <div class="product-card" data-name="ELEGANCE Summer Dress" data-img="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" data-price="1599"></div>
+      <div class="product-card" data-name="CHIC Leather Handbag" data-img="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" data-price="2499"></div>
+      <div class="product-card" data-name="STYLE High-Waist Jeans" data-img="https://images.unsplash.com/photo-1542272604-787c3835535d?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" data-price="1799"></div>
+      <div class="product-card" data-name="GLAM Shoes" data-img="https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-1.2.1&auto=format&fit=crop&w=280&h=400&q=80" data-price="2299"></div>
+    </div>
+  </div>
+
+  <div id="kids" class="section">
+    <h1 class="product-title">KIDS COLLECTION</h1>
+    <div class="products-grid">
+      <div class="product-card" data-name="LITTLE STAR Boys T-Shirt Set" data-img="https://assets.ajio.com/medias/sys_master/root/20250530/5eD7/6839c3bc55340d4b4f7134b0/-473Wx593H-701651610-aqua-MODEL.jpg" data-price="799"></div>
+      <div class="product-card" data-name="PRETTY Girls Floral Dress" data-img="https://assets.ajio.com/medias/sys_master/root/20250608/MvdT/6845a85a55340d4b4f9195f5/-473Wx593H-701702784-multi-MODEL.jpg" data-price="999"></div>
+      <div class="product-card" data-name="COMFY Kids Hoodie Set" data-img="https://assets.ajio.com/medias/sys_master/root/20250130/fGYj/679b441fbc78b543a90a16bc/-473Wx593H-701132965-blue-MODEL.jpg" data-price="1199"></div>
+      <div class="product-card" data-name="JUMPY shirt and pant set" data-img="https://assets.ajio.com/medias/sys_master/root/20250623/tB3y/685961020f920c69cc495dec/-473Wx593H-701802341-grey-MODEL.jpg" data-price="1499"></div>
+    </div>
+  </div>
+
+  <!-- Footer Section -->
+  <footer>
+    <div class="footer-container">
+      <!-- Customer Service Column -->
+      <div class="footer-column">
+        <h3>CUSTOMER SERVICE</h3>
+        <ul>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="#">FAQs</a></li>
+          <li><a href="#">Returns Policy</a></li>
+          <li><a href="#">Shipping Policy</a></li>
+          <li><a href="#">Track Order</a></li>
+          <li><a href="#">Size Guide</a></li>
+          <li><a href="#">Cancellation Policy</a></li>
+        </ul>
+      </div>
+      
+      <!-- About Column -->
+      <div class="footer-column">
+        <h3>ABOUT FASHIONHUB</h3>
+        <ul>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms & Conditions</a></li>
+          <li><a href="#">Responsible Disclosure</a></li>
+          <li><a href="#">Site Map</a></li>
+        </ul>
+      </div>
+      
+      <!-- Shop Column -->
+      <div class="footer-column">
+        <h3>SHOP</h3>
+        <ul>
+          <li><a href="#">Men</a></li>
+          <li><a href="#">Women</a></li>
+          <li><a href="#">Kids</a></li>
+          <li><a href="#">New Arrivals</a></li>
+          <li><a href="#">Best Sellers</a></li>
+          <li><a href="#">Gift Cards</a></li>
+          <li><a href="#">Store Locator</a></li>
+        </ul>
+      </div>
+      
+      <!-- Categories Column -->
+      <div class="footer-column">
+        <h3>CATEGORIES</h3>
+        <ul>
+          <li><a href="#">Clothing</a></li>
+          <li><a href="#">Footwear</a></li>
+          <li><a href="#">Accessories</a></li>
+          <li><a href="#">Watches</a></li>
+          <li><a href="#">Bags</a></li>
+          <li><a href="#">Beauty</a></li>
+          <li><a href="#">Home & Decor</a></li>
+        </ul>
+      </div>
+      
+      <!-- Connect Column -->
+      <div class="footer-column">
+        <img src="https://i.pinimg.com/736x/58/3b/f1/583bf1744b9419813a94323c68f23df9.jpg" class="footer-logo" alt="FashionHub">
+        <p>India's fastest growing online fashion destination</p>
+        
+        <div class="newsletter">
+          <h4>SUBSCRIBE TO NEWSLETTER</h4>
+          <div class="newsletter-input">
+            <input type="email" placeholder="Enter your email">
+            <button>SUBSCRIBE</button>
+          </div>
+        </div>
+        
+        <div class="social-icons">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-pinterest-p"></i></a>
+          <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+        
+        <div class="app-download">
+          <a href="#"><img src="https://constant.myntassets.com/web/assets/img/80cc455a-92f2-4b5c-a038-7da0d92af33f1539674178924-google_play.png" alt="Google Play"></a>
+          <a href="#"><img src="https://constant.myntassets.com/web/assets/img/bc5e11ad-0250-420a-ac71-115a57ca35d51539674178941-apple_store.png" alt="App Store"></a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <div class="footer-bottom-container">
+        <div class="copyright">
+          © 2023 FashionHub India Ltd. All Rights Reserved.
+        </div>
+        <div class="payment-methods">
+          <span>100% SECURE PAYMENT</span>
+          <img src="https://constant.myntassets.com/checkout/assets/img/footer-bank-ssl.png" alt="SSL Secure">
+          <img src="https://constant.myntassets.com/checkout/assets/img/footer-bank-visa.png" alt="Visa">
+          <img src="https://constant.myntassets.com/checkout/assets/img/footer-bank-mc.png" alt="Mastercard">
+          <img src="https://constant.myntassets.com/checkout/assets/img/footer-bank-ae.png" alt="American Express">
+          <img src="https://constant.myntassets.com/checkout/assets/img/footer-bank-dc.png" alt="Diners Club">
+          <img src="https://constant.myntassets.com/checkout/assets/img/footer-bank-nb.png" alt="Net Banking">
+          <img src="https://constant.myntassets.com/checkout/assets/img/footer-bank-cod.png" alt="COD">
+          <img src="https://constant.myntassets.com/checkout/assets/img/footer-bank-rupay.png" alt="RuPay">
+          <img src="https://constant.myntassets.com/checkout/assets/img/footer-bank-paypal.png" alt="PayPal">
+        </div>
+      </div>
+      <div class="copyright-disclaimer">
+        <p>The content of this site is copyright-protected and is the property of FashionHub India Ltd.</p>
+        <p>FashionHub is a registered trademark of FashionHub Brands Limited.</p>
+        <p>All international trademarks and copyrights are the property of their respective owners.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Initialize product cards
+    document.querySelectorAll('.product-card').forEach(card => {
+      const name = card.dataset.name;
+      const img = card.dataset.img;
+      const price = card.dataset.price;
+      
+      card.innerHTML = `
+        <button class="wishlist-btn" onclick="toggleWishlist('${name}', '${img}', ${price})">♥</button>
+        <img src="${img}" alt="${name}" class="product-img">
+        <div class="product-info">
+          <div class="product-name"><b>${name.split(' ')[0]}</b> ${name.split(' ').slice(1).join(' ')}</div>
+          <div class="product-price">₹${price}</div>
+          <div class="product-popularity">${Math.floor(Math.random()*1000)+200}+ bought today</div>
+          <div class="button-group">
+            <button onclick="addToCart('${name}', '${img}', ${price})" class="btn add-to-cart">ADD TO BAG</button>
+            <button onclick="buyNow('${name}', '${img}', ${price})" class="btn buy-now">BUY NOW</button>
+          </div>
+        </div>
+      `;
+    });
+
+    let cart = [], wishlist = [];
+    
+    // Show specific section
+    function showSection(sectionId) {
+      document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active');
+      });
+      document.getElementById(sectionId).classList.add('active');
+    }
+    
+    // Cart functions
+    function addToCart(name, image, price) {
+      cart.push({ name, image, price });
+      updateCartCount();
+      alert(`${name} added to cart!`);
+    }
+    
+    function buyNow(name, image, price) {
+      cart = [{ name, image, price }];
+      updateCartCount();
+      checkout();
+    }
+    
+    function updateCartCount() {
+      document.getElementById('cartCount').textContent = cart.length;
+    }
+    
+    function displayCart() {
+      const cartItems = document.getElementById('cartItems');
+      const cartTotal = document.getElementById('cartTotal');
+      
+      if (cart.length === 0) {
+        cartItems.innerHTML = '<p>Your bag is empty</p>';
+        cartTotal.textContent = '';
+        return;
+      }
+      
+      cartItems.innerHTML = '';
+      let total = 0;
+      
+      cart.forEach((item, index) => {
+        total += parseInt(item.price);
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'modal-item';
+        itemDiv.innerHTML = `
+          <img src="${item.image}" alt="${item.name}">
+          <div>
+            <h4>${item.name}</h4>
+            <p>₹${item.price}</p>
+          </div>
+          <button class="remove-item" onclick="removeFromCart(${index})">Remove</button>
+        `;
+        cartItems.appendChild(itemDiv);
+      });
+      
+      cartTotal.textContent = `Total: ₹${total}`;
+    }
+    
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      updateCartCount();
+      displayCart();
+    }
+    
+    // Wishlist functions
+    function toggleWishlist(name, image, price) {
+      const index = wishlist.findIndex(item => item.name === name);
+      const btn = event.target;
+      
+      if (index === -1) {
+        wishlist.push({ name, image, price });
+        btn.classList.add('active');
+        alert(`${name} added to wishlist!`);
+      } else {
+        wishlist.splice(index, 1);
+        btn.classList.remove('active');
+        alert(`${name} removed from wishlist!`);
+      }
+      
+      updateWishlistCount();
+    }
+    
+    function updateWishlistCount() {
+      document.getElementById('wishlistCount').textContent = wishlist.length;
+    }
+    
+    function displayWishlist() {
+      const wishlistItems = document.getElementById('wishlistItems');
+      
+      if (wishlist.length === 0) {
+        wishlistItems.innerHTML = '<p>Your wishlist is empty</p>';
+        return;
+      }
+      
+      wishlistItems.innerHTML = '';
+      
+      wishlist.forEach((item, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'modal-item';
+        itemDiv.innerHTML = `
+          <img src="${item.image}" alt="${item.name}">
+          <div>
+            <h4>${item.name}</h4>
+            <p>₹${item.price}</p>
+            <button class="btn move-to-cart" onclick="moveToCart(${index})">Add to Bag</button>
+          </div>
+          <button class="remove-item" onclick="removeFromWishlist(${index})">Remove</button>
+        `;
+        wishlistItems.appendChild(itemDiv);
+      });
+    }
+    
+    function removeFromWishlist(index) {
+      wishlist.splice(index, 1);
+      updateWishlistCount();
+      displayWishlist();
+    }
+    
+    function moveToCart(index) {
+      const item = wishlist[index];
+      addToCart(item.name, item.image, item.price);
+      removeFromWishlist(index);
+    }
+    
+    // Checkout functions
+    function checkout() {
+      if (cart.length === 0) {
+        alert('Your cart is empty!');
+        return;
+      }
+      document.getElementById('checkoutModal').style.display = 'block';
+      document.getElementById('overlay').style.display = 'block';
+    }
+    
+    function generateOrderId() {
+      return 'ORD-' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+    }
+    
+    // Event listeners
+    document.getElementById('bagBtn').addEventListener('click', () => {
+      document.getElementById('overlay').style.display = 'block';
+      document.getElementById('cartModal').style.display = 'block';
+      displayCart();
+    });
+    
+    document.getElementById('wishlistBtn').addEventListener('click', () => {
+      document.getElementById('overlay').style.display = 'block';
+      document.getElementById('wishlistModal').style.display = 'block';
+      displayWishlist();
+    });
+    
+    document.getElementById('closeCart').addEventListener('click', closeModals);
+    document.getElementById('closeWishlist').addEventListener('click', closeModals);
+    document.getElementById('overlay').addEventListener('click', closeModals);
+    document.getElementById('checkoutBtn').addEventListener('click', checkout);
+    
+    document.getElementById('cancelCheckout').addEventListener('click', () => {
+      document.getElementById('checkoutModal').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+    });
+    
+    document.getElementById('checkoutForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      document.getElementById('orderId').textContent = generateOrderId();
+      document.getElementById('checkoutModal').style.display = 'none';
+      document.getElementById('confirmationModal').style.display = 'block';
+    });
+    
+    document.getElementById('continueShopping').addEventListener('click', () => {
+      cart = [];
+      updateCartCount();
+      closeModals();
+    });
+    
+    function closeModals() {
+      document.getElementById('overlay').style.display = 'none';
+      document.getElementById('cartModal').style.display = 'none';
+      document.getElementById('wishlistModal').style.display = 'none';
+      document.getElementById('checkoutModal').style.display = 'none';
+      document.getElementById('confirmationModal').style.display = 'none';
+    }
+  </script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>
